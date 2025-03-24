@@ -6,22 +6,12 @@ import (
 	"net"
 
 	"github.com/eiannone/keyboard"
-)
-
-const (
-	HOST = "localhost"
-	PORT = ":7740"
-	TYPE = "tcp"
+	"github.com/leosalgado/socket/config"
 )
 
 func StartClient() {
-	const (
-		HOST = "localhost"
-		PORT = ":7740"
-		TYPE = "tcp"
-	)
 
-	conn, err := net.Dial(TYPE, HOST+PORT)
+	conn, err := net.Dial(config.TYPE, config.HOST+config.PORT)
 	if err != nil {
 		log.Fatal(err)
 	}
