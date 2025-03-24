@@ -33,7 +33,6 @@ func StartClient() {
 		if keyCode == keyboard.KeyEsc {
 			fmt.Println("Exiting...")
 			return
-			// break
 		}
 
 		_, err = conn.Write([]byte(string(key)))

@@ -2,6 +2,7 @@ package server
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net"
 
@@ -36,7 +37,12 @@ func handleRequest(conn net.Conn) {
 		buffer := make([]byte, 1)
 		_, err := conn.Read(buffer)
 		if err != nil {
-			log.Fatal(err)
+			if err == io.EOF {
+				fmt.Printf("Client %v disconnected.\n", conn.RemoteAddr())
+				return
+			}
+			log.Println(err)
+			return
 		}
 
 		keyPressed := string(buffer)
