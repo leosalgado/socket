@@ -2,51 +2,53 @@ package server
 
 import (
 	"fmt"
-	"io"
 	"log"
-	"net"
+	"net/http"
 
+	"github.com/gorilla/websocket"
 	"github.com/leosalgado/socket/config"
 )
 
-func StartServer() {
-
-	listen, err := net.Listen(config.TYPE, config.HOST+config.PORT)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer listen.Close()
-
-	fmt.Println("Server is listening on", config.HOST+config.PORT)
-
-	for {
-		conn, err := listen.Accept()
-		if err != nil {
-			log.Fatal(err)
-			continue
-		}
-		go handleRequest(conn)
-
-	}
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
 }
 
-func handleRequest(conn net.Conn) {
-	defer conn.Close()
+func StartServer() {
+	fmt.Println("Server listening on ws://" + config.HOST + config.PORT + "/ws")
+	setupRoutes()
+}
 
+func setupRoutes() {
+	http.HandleFunc("/ws", handleConnections)
+	log.Fatal(http.ListenAndServe(config.PORT, nil))
+}
+
+func handleConnections(w http.ResponseWriter, r *http.Request) {
+	upgrader.CheckOrigin = func(r *http.Request) bool { return true }
+
+	ws, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println(err)
+	}
+
+	reader(ws)
+}
+
+func reader(conn *websocket.Conn) {
 	for {
-		buffer := make([]byte, 1)
-		_, err := conn.Read(buffer)
+		messageType, msg, err := conn.ReadMessage()
 		if err != nil {
-			if err == io.EOF {
-				fmt.Printf("Client %v disconnected.\n", conn.RemoteAddr())
-				return
-			}
 			log.Println(err)
 			return
 		}
 
-		keyPressed := string(buffer)
+		fmt.Printf("Received %s \n", msg)
 
-		fmt.Printf("Server received: %q\n", keyPressed)
+		err = conn.WriteMessage(messageType, msg)
+		if err != nil {
+			log.Println(err)
+			return
+		}
 	}
 }

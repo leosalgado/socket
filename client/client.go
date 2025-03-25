@@ -3,15 +3,14 @@ package client
 import (
 	"fmt"
 	"log"
-	"net"
 
 	"github.com/eiannone/keyboard"
+	"github.com/gorilla/websocket"
 	"github.com/leosalgado/socket/config"
 )
 
 func StartClient() {
-
-	conn, err := net.Dial(config.TYPE, config.HOST+config.PORT)
+	conn, _, err := websocket.DefaultDialer.Dial("ws://"+config.HOST+config.PORT+"/ws", nil)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -35,7 +34,10 @@ func StartClient() {
 			return
 		}
 
-		_, err = conn.Write([]byte(string(key)))
+		if err := conn.WriteMessage(websocket.TextMessage, []byte(string(key))); err != nil {
+			log.Println(err)
+			return
+		}
 		if err != nil {
 			log.Fatal(err)
 		}
