@@ -16,10 +16,7 @@ var upgrader = websocket.Upgrader{
 
 func StartServer() {
 	fmt.Println("Server listening on ws://" + config.HOST + config.PORT + "/ws")
-	setupRoutes()
-}
 
-func setupRoutes() {
 	http.HandleFunc("/ws", handleConnections)
 	log.Fatal(http.ListenAndServe(config.PORT, nil))
 }
