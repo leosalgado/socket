@@ -1,7 +1,6 @@
 # Socket
 
-[socket_demo.webm](https://github.com/user-attachments/assets/c69a203a-0de8-4dd7-9997-6e238138c2a9)
-
+[socket_demo.mp4](https://github.com/user-attachments/assets/a7699dd8-265a-4568-b2cd-29ed8b9032a8)
 
 ## Install
 
